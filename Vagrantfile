@@ -6,12 +6,12 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
-
+# K1003a5e062ad055d12d65c2c984d3df3825ff41305a272dcfe8d6cdfad39c3efd6::server:b70b8c9b13b7abcf07eb1dec50c62e19
 
 
 VAGRANTFILE_API_VERSION = "2"
 
-ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The most common configuration options are documented and commented below.
@@ -20,20 +20,45 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.provider "docker" do |provider|
-    provider.image = "bashtoni/centos7-vagrant"
-    # provider.has_ssh = true
-    provider.create_args = [ "--privileged", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro" ]
+  config.vm.box = "bento/centos-7"
+  config.vm.boot_timeout = 120
+  # config.vm.provider "virtualbox" do |provider|
+  #   provider.cpus = 1
+  #   provider.memory = 512
+  #   # provider.has_ssh = true
+  #   # provider.create_args = [ "--privileged", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro" ]
 
-  end
+  # end
 
 
-  config.vm.define "Server" do |s|
+  config.vm.define "zcolleenS" do |s|
+    s.vm.provider "virtualbox" do |provider|
+      provider.cpus = 1
+      provider.memory = 512
+
+      provider.customize ["modifyvm", :id, "--name", "zcolleenS", "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
+    end
+
+    s.vm.provision "shell", inline: <<-SHELL
+        curl -sfL https://get.k3s.io | sh
+        token = cat /var/lib/rancher/k3s/server/node-token
+      SHELL
     s.vm.network :private_network, ip: "192.168.42.110"
   end
 
-  config.vm.define "ServerWorker" do |sw|
-      sw.vm.define :private_network, ip: "192.168.42.111"
+  config.vm.define "zcolleenSW" do |sw|
+
+    sw.vm.provider "virtualbox" do |provider|
+      provider.cpus = 1
+      provider.memory = 512
+
+      provider.customize ["modifyvm", :id, "--name", "zcolleenSW", "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
+    end
+
+    sw.vm.network :private_network, ip: "192.168.42.111"
+    sw.vm.provision "shell", inline: <<-SHELL
+    curl -sfL https://get.k3s.io | K3S_URL=https://192.168.42.110:6443 K3S_TOKEN=mynodetoken sh -
+      SHELL
   end
 
   # Disable automatic box update checking. If you disable this, then
