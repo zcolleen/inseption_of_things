@@ -6,12 +6,12 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
-# K1003a5e062ad055d12d65c2c984d3df3825ff41305a272dcfe8d6cdfad39c3efd6::server:b70b8c9b13b7abcf07eb1dec50c62e19
-
 
 VAGRANTFILE_API_VERSION = "2"
+SHARED_HOST_FOLDER = "./token"
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The most common configuration options are documented and commented below.
@@ -39,12 +39,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       provider.customize ["modifyvm", :id, "--name", "zcolleenS", "--natdnsproxy1", "on", "--natdnshostresolver1", "on"]
     end
 
-    s.vm.provision "shell", inline: <<-SHELL
-        curl -sfL https://get.k3s.io | sh
-        token = cat /var/lib/rancher/k3s/server/node-token
-      SHELL
     s.vm.network :private_network, ip: "192.168.42.110"
+    s.vm.provision "shell", inline: <<-SHELL
+        curl -sfL https://get.k3s.io | sh -s - server --write-kubeconfig-mode 0644
+        cat /var/lib/rancher/k3s/server/node-token > /var/lib/rancher/k3s/server/token_dir/token
+        # /usr/local/bin/k3s server --write-kubeconfig-mode 0777   # may be needed
+        # token = cat /var/lib/rancher/k3s/server/node-token
+      SHELL
+
+      s.vm.synced_folder SHARED_HOST_FOLDER, "/var/lib/rancher/k3s/server/token_dir", create: true
   end
+
 
   config.vm.define "zcolleenSW" do |sw|
 
@@ -57,8 +62,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     sw.vm.network :private_network, ip: "192.168.42.111"
     sw.vm.provision "shell", inline: <<-SHELL
-    curl -sfL https://get.k3s.io | K3S_URL=https://192.168.42.110:6443 K3S_TOKEN=mynodetoken sh -
+        curl -sfL https://get.k3s.io | K3S_URL=https://192.168.42.110:6443 K3S_TOKEN=$(cat /var/lib/rancher/k3s/server/token_dir/token) sh -
       SHELL
+
+    sw.vm.synced_folder SHARED_HOST_FOLDER, "/var/lib/rancher/k3s/server/token_dir", create: true
   end
 
   # Disable automatic box update checking. If you disable this, then
