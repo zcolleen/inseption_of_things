@@ -1,7 +1,7 @@
 
 
 VAGRANTFILE_API_VERSION = "2"
-SHARED_HOST_FOLDER = "./confs"
+SHARED_HOST_FOLDER = "../confs"
 SHARED_GUEST = "/zcolleen"
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
