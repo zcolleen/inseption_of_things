@@ -1,0 +1,4 @@
+write-kubeconfig-mode: 0644
+node-ip: 192.168.42.110
+node-name: zcolleenS
+token: fucktokens
