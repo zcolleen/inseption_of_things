@@ -1,0 +1,31 @@
+
+
+VAGRANTFILE_API_VERSION = "2"
+
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    config.vm.box = "bento/ubuntu-20.04"
+    config.vm.boot_timeout = 120
+
+    config.vm.provision "shell", inline: <<-SHELL
+
+    ### kubectl k3d and docker install
+        curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+        apt-get update && apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
+        curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+        echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        apt-get update && apt-get install -y docker-ce kubectl
+        chmod 0666 /var/run/docker.sock
+        k3d cluster create gitlab
+    ###
+
+    SHELL
+
+end
