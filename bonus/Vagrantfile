@@ -1,6 +1,8 @@
 
 
 VAGRANTFILE_API_VERSION = "2"
+RUNNER_TOKEN="9PsC5FUQdSaaqFsinomj"
+
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
@@ -24,6 +26,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         apt-get update && apt-get install -y docker-ce kubectl
         chmod 0666 /var/run/docker.sock
         k3d cluster create gitlab
+        curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash
+        apt-get install gitlab-runner
+        printf "\n\n\ndeploy\nkubernetes\n" | gitlab-runner register --url https://gitlab.com/ --registration-token #{RUNNER_TOKEN}
+        gitlab-runner start
     ###
 
     SHELL
