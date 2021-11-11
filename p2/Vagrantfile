@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+require "./confs/vagrantconf.rb"
+include Vagrantconf
+
+Vagrantconf::createK3Sargs
+
+Vagrant.configure("2") do |config|
+    
+    config.vm.box = BOX
+	config.vm.synced_folder HOST_DIR, GUEST_DIR, type: PROVIDER
+
+    config.vm.define "#{NAME}" do |server|
+        server.vm.provider "#{PROVIDER}" do |vbox|
+            vbox.name = NAME
+            vbox.cpus = CPUS
+            vbox.memory = MEMORY
+        end
+
+        server.vm.network "private_network", ip: IP
+        server.vm.hostname = NAME
+        server.vm.provision "shell" do |sh|
+			sh.path = "scripts/bootstrap.sh"
+			sh.env = {
+				PATH: "$PATH:/usr/local/bin",
+				SHARED_PATH: GUEST_DIR
+			}
+		end
+    end
+
+end
