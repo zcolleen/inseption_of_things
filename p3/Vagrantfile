@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+SETTINGS = "./confs/master.yaml"
+   
+CONF = YAML::load_file(SETTINGS)["server"]
+
+Vagrant.configure("2") do |config|
+	config.vm.box = CONF["box"]
+
+    config.vm.define CONF["name"] do |server|
+        server.vm.provider CONF["provider"] do |vbox|
+            vbox.name = CONF["name"]
+            vbox.cpus = CONF["cpus"]
+            vbox.memory = CONF["memory"]
+        end
+
+        server.vm.network "private_network", ip: CONF["ip"]
+        server.vm.hostname = CONF["name"]
+		server.vm.provision "shell" do |sh|
+			sh.path = "scripts/bootstrap.sh"
+			sh.reboot = true
+			sh.privileged = false
+			sh.env = { "CLUSTER": CONF["name"] }
+		end
+		server.vm.provision "shell", path: "scripts/deploy.sh", privileged: false
+    end
+
+end
