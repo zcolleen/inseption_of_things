@@ -1,0 +1,7 @@
+server:
+  name: wquinoaS
+  box: hashicorp/bionic64
+  provider: virtualbox
+  ip: 192.168.42.110
+  memory: 4096
+  cpus: 3
