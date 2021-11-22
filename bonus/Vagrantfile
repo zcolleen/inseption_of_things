@@ -9,10 +9,16 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    config.vm.box = "bento/ubuntu-20.04"
+    config.vm.box = "ubuntu/xenial64"
     config.vm.boot_timeout = 120
 
+    config.vm.network :private_network, ip: "192.168.42.112"
+
+    config.vm.provision "file", source: "./config/values.yaml", destination: "$HOME/config/values.yaml"
+
+    config.vm.synced_folder "./config/", "/config/", create: true
     config.vm.provision "shell", inline: <<-SHELL
+
 
     ### kubectl k3d and docker install
         curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
@@ -25,11 +31,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
         apt-get update && apt-get install -y docker-ce kubectl
         chmod 0666 /var/run/docker.sock
-        k3d cluster create gitlab
-        curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash
-        apt-get install gitlab-runner
-        printf "\n\n\ndeploy\nkubernetes\n" | gitlab-runner register --url https://gitlab.com/ --registration-token #{RUNNER_TOKEN}
-        gitlab-runner start
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        # kubectl create namespace gitlab
+        # k3d cluster create gitlab
+        # helm repo add gitlab https://charts.gitlab.io
+        # helm install --namespace gitlab gitlab-runner -f /config/values.yaml gitlab/gitlab-runner
+
+        # curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash
+        # apt-get install gitlab-runner
+        # printf "\n\n\ndeploy\nkubernetes\n" | gitlab-runner register --url https://gitlab.com/ --registration-token #{RUNNER_TOKEN}
+        # gitlab-runner start
     ###
 
     SHELL
