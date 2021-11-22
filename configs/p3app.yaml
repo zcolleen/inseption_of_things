@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: crazy-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: ndreadno
   ports:
