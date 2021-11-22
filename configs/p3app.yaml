@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ndreadno
+spec:
+  selector:
+    matchLabels:
+      app: ndreadno
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ndreadno
+    spec:
+      containers:
+      - name: ndreadno
+        image: wil42/playground:v1
+        ports:
+        - containerPort: 8888
