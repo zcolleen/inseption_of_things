@@ -16,14 +16,13 @@ Vagrant.configure("2") do |config|
         end
 
         server.vm.network "private_network", ip: CONF["ip"]
+        server.vm.network "forwarded_port", guest: 80, host:8080
+        server.vm.network "forwarded_port", guest: 443, host:8443
         server.vm.hostname = CONF["name"]
-		server.vm.provision "shell" do |sh|
-			sh.path = "scripts/bootstrap.sh"
-			sh.reboot = true
-			sh.privileged = false
-			sh.env = { "CLUSTER": CONF["name"] }
-		end
-		server.vm.provision "shell", path: "scripts/deploy.sh", privileged: false
+		server.vm.provision "shell", path: "scripts/bootstrap.sh",
+			privileged: false, reboot: true
+		server.vm.provision "shell", path: "scripts/deploy.sh",
+			privileged: false, env: { "CLUSTER": CONF["name"] }
     end
 
 end
