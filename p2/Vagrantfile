@@ -1,30 +1,37 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-require "./confs/vagrantconf.rb"
-include Vagrantconf
 
-Vagrantconf::createK3Sargs
+SETTINGS = "./confs/master.yaml"
 
-Vagrant.configure("2") do |config|
-    
-    config.vm.box = BOX
-	config.vm.synced_folder HOST_DIR, GUEST_DIR, type: PROVIDER
+CONF = YAML::load_file(SETTINGS)["server"]
 
-    config.vm.define "#{NAME}" do |server|
-        server.vm.provider "#{PROVIDER}" do |vbox|
-            vbox.name = NAME
-            vbox.cpus = CPUS
-            vbox.memory = MEMORY
+Vagrant.configure("2") do |node|
+
+    node.vm.box = CONF["box"]
+
+	node.trigger.before :up do |trigger|
+		k3s_args = YAML::load_file(SETTINGS)["k3sconf"]
+		k3s_args["node-ip"] = CONF["ip"]
+		k3s_args["node-name"] = CONF["name"]
+		File.write(CONF["shared"]["host"] + "/k3s_args.yaml", k3s_args.to_yaml)
+	end
+
+    node.vm.define CONF["name"] do |server|
+        server.vm.provider CONF["provider"] do |vbox|
+            vbox.name = CONF["name"]
+            vbox.cpus = CONF["cpus"]
+            vbox.memory = CONF["memory"]
         end
 
-        server.vm.network "private_network", ip: IP
-        server.vm.hostname = NAME
+		server.vm.provision "file",
+			source: CONF["shared"]["host"],
+			destination: CONF["shared"]["guest"]
+        server.vm.network "private_network", ip: CONF["ip"]
+        server.vm.hostname = CONF["name"]
         server.vm.provision "shell" do |sh|
 			sh.path = "scripts/bootstrap.sh"
-			sh.env = {
-				PATH: "$PATH:/usr/local/bin",
-				SHARED_PATH: GUEST_DIR
-			}
+			sh.privileged = false
+			sh.env = { SHARED_PATH: CONF["shared"]["guest"] }
 		end
     end
 

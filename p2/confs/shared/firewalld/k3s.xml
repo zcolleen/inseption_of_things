@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>k3s</short>
+  <description>Network configuration is hard</description>
+  <port port="53" protocol="tcp"/>
+  <port port="53" protocol="udp"/>
+  <port port="80" protocol="tcp"/>
+  <port port="443" protocol="tcp"/>
+  <port port="30531" protocol="tcp"/>
+  <port port="32576" protocol="tcp"/>
+  <port port="2376" protocol="tcp"/>
+  <port port="6443" protocol="tcp"/>
+  <port port="8472" protocol="udp"/>
+  <port port="9099" protocol="tcp"/>
+  <port port="10250" protocol="tcp"/>
+  <port port="10254" protocol="tcp"/>
+  <port port="30000-32767" protocol="tcp"/>
+  <port port="30000-32767" protocol="udp"/>
+  <port port="22" protocol="tcp"/>
+  <port port="2379" protocol="tcp"/>
+  <port port="2380" protocol="tcp"/>
+</service>

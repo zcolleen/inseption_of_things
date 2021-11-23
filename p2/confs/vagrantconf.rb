@@ -1,5 +1,6 @@
 module Vagrantconf
 
+	CONF = YAML::load_file("./confs/master.yaml")["server"]
 	NAME = "wquinoaS"
 	IP = "192.168.42.110"
 
@@ -13,7 +14,7 @@ module Vagrantconf
 	CPUS = "3"
 
 	def self.createK3Sargs
-		conf = YAML::load_file("#{HOST_DIR}/k3s_args.yaml")
+		conf = CONF["k3sconf"]
 		conf["node-ip"] = IP
 		conf["node-name"] = NAME
 		File.write("#{HOST_DIR}/k3s_args.yaml", conf.to_yaml)

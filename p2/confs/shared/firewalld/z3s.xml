@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>z3s</short>
+  <description>Disgusting</description>
+  <service name="ssh"/>
+  <service name="dhcpv6-client"/>
+  <service name="cockpit"/>
+  <service name="k3s"/>
+  <masquerade/>
+</zone>
+

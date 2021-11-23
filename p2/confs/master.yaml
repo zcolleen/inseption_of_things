@@ -1,0 +1,14 @@
+server:
+  name: wquinoaS
+  box: generic/centos8
+  provider: virtualbox
+  ip: 192.168.42.110
+  memory: 2048
+  cpus: 3
+  shared: 
+    host: confs/shared
+    guest: /home/vagrant/shared
+
+k3sconf:
+  write-kubeconfig-mode: 600
+  flannel-iface: eth1
