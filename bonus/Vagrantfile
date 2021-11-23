@@ -17,8 +17,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision "file", source: "./confs/values.yaml", destination: "$HOME/config/values.yaml"
     config.vm.provision "file", source: "./confs/svaccounts.yaml", destination: "$HOME/config/svaccounts.yaml"
 
-    config.vm.synced_folder "./config/", "/config/", create: true
-    config.vm.provision "shell", inline: <<-SHELL
+    # config.vm.synced_folder "./config/", "/config/", create: true
+    config.vm.provision "shell", privileged: false, inline: <<-SHELL
 
 
     ### kubectl k3d and docker install
