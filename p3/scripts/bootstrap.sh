@@ -8,4 +8,3 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 sudo curl -fsSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 sudo chmod +x /usr/local/bin/argocd
-#sudo chmod 755 -R ~/.k3d/cache
