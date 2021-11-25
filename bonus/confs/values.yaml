@@ -46,7 +46,7 @@ runners:
   config: |
     [[runners]]
       [runners.kubernetes]
-        namespace = "gitlab"
+        namespace = "dev"
         image = "ubuntu:16.04"
         url = "https://gitlab.com/"
         token = "PtNgSXKtxzF5YsHA4mpR"

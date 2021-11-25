@@ -9,34 +9,18 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    config.vm.box = "ubuntu/xenial64"
+    config.vm.box = "hashicorp/bionic64"
     config.vm.boot_timeout = 120
 
     config.vm.network :private_network, ip: "192.168.42.112"
+	config.vm.provider "virtualbox" do |v|
+		v.memory = "2048"
+	end
 
     config.vm.provision "file", source: "./confs/values.yaml", destination: "$HOME/config/values.yaml"
     config.vm.provision "file", source: "./confs/svaccounts.yaml", destination: "$HOME/config/svaccounts.yaml"
 
-    config.vm.provision "shell", privileged: false, inline: <<-SHELL
 
-        curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
-        sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
-        curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-        echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update && sudo apt-get install -y docker-ce kubectl
-        sudo chmod 0666 /var/run/docker.sock
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-        k3d cluster create gitlab
-        kubectl create namespace gitlab
-        helm repo add gitlab https://charts.gitlab.io
-        helm install --namespace gitlab gitlab-runner -f ./config/values.yaml gitlab/gitlab-runner
-        kubectl apply -f ./config/svaccounts.yaml
-        # kubectl port-forward service/crazy-service 8888:8888 &
-
-    SHELL
+    config.vm.provision "shell", path: "scripts/scr.sh"
 
 end
