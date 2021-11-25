@@ -19,7 +19,7 @@ rbac:
       resources: ["*"]
       verbs: ["*"]
 
-  clusterWideAccess: false
+  clusterWideAccess: true
 
   podSecurityPolicy:
     enabled: false
