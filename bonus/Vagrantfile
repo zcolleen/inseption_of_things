@@ -9,12 +9,14 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    config.vm.box = "hashicorp/bionic64"
+    # config.vm.box = "hashicorp/bionic64"
+    config.vm.box = "ubuntu/xenial64"
     config.vm.boot_timeout = 120
 
     config.vm.network :private_network, ip: "192.168.42.112"
 	config.vm.provider "virtualbox" do |v|
-		v.memory = "2048"
+        v.cpus = 3
+		v.memory = "6000"
 	end
 
     config.vm.provision "file", source: "./confs/values.yaml", destination: "$HOME/config/values.yaml"
