@@ -2,6 +2,8 @@
 nslookup get.docker.com
 curl -fsSL https://get.docker.com | bash
 usermod -aG docker $USER
+export RHOME=/home/vagrant
+
 
 curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 
@@ -17,24 +19,20 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 k3d cluster create gitlab
 
 cat <<- EOF > $HOME/.bashrc && source $HOME/.bashrc
-	export KUBECONFIG=$(sudo k3d kubeconfig write gitlab)
+	export KUBECONFIG=$(k3d kubeconfig write gitlab)
 	alias k=kubectl
 EOF
 chown $(id -u):$(id -g) $KUBECONFIG
 
+
+kubectl create ns dev
 kubectl create ns gitlab
 kubectl apply -n gitlab -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl patch svc argocd-server -n gitlab -p '{"spec": {"type": "LoadBalancer"}}'
-kubectl apply -n gitlab -f ~/config/app.yaml
 
-echo Waiting for argocd web-interface endpoint...
-echo You CAN ssh into the machine in another terminal.
-
-
-# cp -r /srv/gitlab ~/gitlab
 # gitlab
-chmod -R 0777 ~/gitlab
-export GITLAB_HOME=~/gitlab
+chmod -R 0777 $RHOME/gitlab/data
+export GITLAB_HOME=$RHOME/gitlab/
 docker run --detach \
   --hostname gitlab.ndreadno.com \
   --publish 443:443 --publish 80:80 --publish 2222:22 \
@@ -50,9 +48,15 @@ docker run --detach \
 
 echo "127.0.0.1           gitlab.ndreadno.com" >> /etc/hosts
 
-params="-n argocd -l app.kubernetes.io/name=argocd-server --timeout=10m"
+
+kubectl apply -n gitlab -f $RHOME/config/app.yaml
+
+echo Waiting for argocd web-interface endpoint...
+echo You CAN ssh into the machine in another terminal.
+
+params="-n gitlab -l app.kubernetes.io/name=argocd-server --timeout=10m"
 kubectl wait --for=condition=available deployment $params
 kubectl wait --for=condition=ready pod $params
 
-pass=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath={.data.password} | base64 --decode)
-echo $pass | tee ~/argopasswd | sed "s|^|Argocd password: |g"
+pass=$(kubectl get secret argocd-initial-admin-secret -n gitlab -o jsonpath={.data.password} | base64 --decode)
+echo $pass | tee /home/vagrant/argopasswd | sed "s|^|Argocd password: |g"

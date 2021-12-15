@@ -22,9 +22,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v.memory = "6000"
 	end
 
-    # config.vm.synced_folder "shared/gitlab", "/srv/gitlab/data", create: true
+    config.vm.synced_folder "shared", "/shared", create: true
 
-    config.vm.provision "file", source: "./shared/gitlab", destination: "$HOME/gitlab/data"
+    config.vm.provision "file", source: "./confs/data", destination: "$HOME/gitlab/data"
     
     config.vm.provision "file", source: "./confs", destination: "$HOME/config"
     
