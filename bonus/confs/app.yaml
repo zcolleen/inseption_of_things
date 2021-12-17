@@ -2,16 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: crazy-app
-  namespace: gitlab
+  namespace: argocd
 spec:
   project: default
   source:
     repoURL: 'http://gitlab.ndreadno.com/root/inseption_of_things.git'
-    path: configs
+    path: .
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: dev
+    namespace: gitlab
   syncPolicy:
     automated:
       prune: true
