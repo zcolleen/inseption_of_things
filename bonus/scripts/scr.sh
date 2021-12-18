@@ -16,6 +16,7 @@ chmod +x /usr/local/bin/argocd
 
 apt-get update && sudo apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+k3d cluster create gitlab
 
 cat <<- EOF > $HOME/.bashrc && source $HOME/.bashrc
 	export KUBECONFIG=$(k3d kubeconfig write gitlab)
