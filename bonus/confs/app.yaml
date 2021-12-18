@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'http://gitlab.ndreadno.com/root/inseption_of_things.git'
+    repoURL: 'http://var/root/inseption_of_things.git'
     path: .
     targetRevision: HEAD
   destination:
