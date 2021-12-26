@@ -1,7 +1,6 @@
 
 
 VAGRANTFILE_API_VERSION = "2"
-RUNNER_TOKEN="9PsC5FUQdSaaqFsinomj"
 
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
@@ -21,12 +20,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v.memory = "10000"
 	end
 
-    # config.vm.provision "file", source: "./confs/data", destination: "$HOME/gitlab/data"
     
     config.vm.provision "file", source: "./confs", destination: "$HOME/config"
     
     config.vm.provision "shell", path: "scripts/scr.sh"
 
-    # config.vm.synced_folder "./shared", "/zcolleen", create: true
 
 end

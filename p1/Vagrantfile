@@ -33,7 +33,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        --write-kubeconfig-mode 0644 \
        --node-ip "192.168.42.110" \
        --flannel-iface eth1
-      #  mkdir -p #{SHARED_GUEST}
        cp /var/lib/rancher/k3s/server/node-token #{SHARED_GUEST}/token
     SHELL
 
@@ -42,7 +41,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.run = { "inline": "/bin/bash -c 'vagrant ssh --no-tty -c \"sudo cat #{SHARED_GUEST}/token\" zcolleenS > #{SHARED_HOST_FOLDER}/token'" }
     end
 
-    # s.vm.synced_folder SHARED_HOST_FOLDER, SHARED_GUEST, create: true
   end
 
 
@@ -60,7 +58,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     sw.vm.network :private_network, ip: "192.168.42.111"
     sw.vm.hostname = "zcolleenSW"
     sw.vm.provision "shell", privileged: true, inline: <<-SHELL
-      #  mkdir -p #{SHARED_GUEST}
        curl -sfL https://get.k3s.io | sh -s - agent \
        --server "https://192.168.42.110:6443" \
        --node-ip "192.168.42.111" \
@@ -68,7 +65,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        --token-file #{SHARED_GUEST}/token
     SHELL
 
-    # sw.vm.synced_folder SHARED_HOST_FOLDER, SHARED_GUEST, create: true
   end
 
 end
