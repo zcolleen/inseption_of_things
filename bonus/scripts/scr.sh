@@ -58,14 +58,14 @@ sleep 20
 
 curl -v  --header "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects?name=inseption_of_things&visibility=public"
 
-export content="$(cat $RHOME/config/deploy.yaml)"
-export data="$(jq -n --arg content "$content" \
+export CONTENT="$(curl https://raw.githubusercontent.com/zcolleen/inseption_of_things/master/configs/p3app.yaml)"
+export DATA="$(jq -n --arg content "$CONTENT" \
   '{"branch": "master", "author_email": "root@example.com", "author_name": "Root Rootov", "content": $content, "commit_message": "root"}')"
 sleep 20
 
 curl -v --request POST --header 'PRIVATE-TOKEN: token-string-here123' \
      --header "Content-Type: application/json" \
-     --data "$data" \
+     --data "$DATA" \
      "http://localhost/api/v4/projects/2/repository/files/deploy%2Eyaml"
 
 echo "127.0.0.1           gitlab.ndreadno.com" >> /etc/hosts
