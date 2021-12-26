@@ -1,4 +1,6 @@
-       
+apt update -y && \
+  apt install -y jq
+
 nslookup get.docker.com
 curl -fsSL https://get.docker.com | bash
 usermod -aG docker $USER
@@ -42,13 +44,29 @@ docker run --detach \
   --publish 443:443 --publish 80:80 --publish 2222:22 \
   --name gitlab \
   --restart always \
-  --volume $GITLAB_HOME/config:/etc/gitlab \
-  --volume $GITLAB_HOME/logs:/var/log/gitlab \
-  --volume $GITLAB_HOME/data:/var/opt/gitlab \
   -e GITLAB_SKIP_UNMIGRATED_DATA_CHECK=true \
-  --cpus 3 \
-  --memory 4294967296 \
+  --cpus 4 \
+  --memory 8294967296 \
   gitlab/gitlab-ee:latest
+
+bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:80)" != "302" ]]; do sleep 5; done'
+sleep 60
+
+docker exec gitlab gitlab-rails runner \
+  "token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :read_repository, :api, :read_api, :write_repository, :sudo], name: 'Automation token'); token.set_token('token-string-here123'); token.save!"
+sleep 20
+
+curl -v  --header "PRIVATE-TOKEN: token-string-here123" -X POST "http://localhost/api/v4/projects?name=inseption_of_things&visibility=public"
+
+export content="$(cat $RHOME/config/deploy.yaml)"
+export data="$(jq -n --arg content "$content" \
+  '{"branch": "master", "author_email": "root@example.com", "author_name": "Root Rootov", "content": $content, "commit_message": "root"}')"
+sleep 20
+
+curl -v --request POST --header 'PRIVATE-TOKEN: token-string-here123' \
+     --header "Content-Type: application/json" \
+     --data "$data" \
+     "http://localhost/api/v4/projects/2/repository/files/deploy%2Eyaml"
 
 echo "127.0.0.1           gitlab.ndreadno.com" >> /etc/hosts
 

@@ -17,14 +17,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
 	config.vm.provider "virtualbox" do |v|
-        v.cpus = 3
-		v.memory = "6000"
+        v.cpus = 4
+		v.memory = "10000"
 	end
 
-    config.vm.provision "file", source: "./confs/data", destination: "$HOME/gitlab/data"
+    # config.vm.provision "file", source: "./confs/data", destination: "$HOME/gitlab/data"
     
     config.vm.provision "file", source: "./confs", destination: "$HOME/config"
     
     config.vm.provision "shell", path: "scripts/scr.sh"
+
+    # config.vm.synced_folder "./shared", "/zcolleen", create: true
 
 end

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crazy-deployment
+spec:
+  selector:
+    matchLabels:
+      app: ndreadno
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ndreadno
+    spec:
+      containers:
+      - name: ndreadno
+        image: wil42/playground:v2
+        ports:
+        - containerPort: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crazy-service
+spec:
+  type: ClusterIP
+  selector:
+    app: ndreadno
+  ports:
+    - name: http
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
