@@ -11,7 +11,7 @@ sudo chown $(id -u):$(id -g) $KUBECONFIG
 kubectl create ns argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-kubectl apply -n argocd -f /vagrant/confs/app.yaml
+kubectl apply -n argocd -f /tmp/app.yaml
 
 echo Waiting for argocd web-interface endpoint...
 echo You CAN ssh into the machine in another terminal.

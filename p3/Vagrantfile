@@ -19,8 +19,8 @@ Vagrant.configure("2") do |config|
         server.vm.network "forwarded_port", guest: 80, host:8080
         server.vm.network "forwarded_port", guest: 443, host:8443
         server.vm.hostname = CONF["name"]
-		server.vm.provision "shell", path: "scripts/bootstrap.sh",
-			privileged: false, reboot: true
+		server.vm.provision "file", source: "confs/app.yaml", destination: "/tmp/app.yaml"
+		server.vm.provision "shell", path: "scripts/bootstrap.sh", privileged: false
 		server.vm.provision "shell", path: "scripts/deploy.sh",
 			privileged: false, env: { "CLUSTER": CONF["name"] }
     end
